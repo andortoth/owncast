@@ -13,6 +13,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 
@@ -261,6 +262,10 @@ func ValidatedFfmpegPath(ffmpegPath string) string {
 
 	// First look to see if ffmpeg is in the current working directory
 	localCopy := "./ffmpeg"
+	if runtime.GOOS == "windows" {
+		localCopy = "./ffmpeg.exe"
+	}
+
 	hasLocalCopyError := VerifyFFMpegPath(localCopy)
 	if hasLocalCopyError == nil {
 		// No error, so all is good.  Use the local copy.
@@ -295,7 +300,7 @@ func VerifyFFMpegPath(path string) error {
 
 	mode := stat.Mode()
 	// source: https://stackoverflow.com/a/60128480
-	if mode&0o111 == 0 {
+	if runtime.GOOS != "windows" && mode&0o111 == 0 {
 		return errors.New("ffmpeg path is not executable")
 	}
 

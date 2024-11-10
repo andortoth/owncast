@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -124,7 +125,11 @@ func (t *Transcoder) Start(shouldLog bool) {
 		log.Println(command)
 	}
 
-	_commandExec = exec.Command("sh", "-c", command)
+	if runtime.GOOS == "windows" {
+		_commandExec = exec.Command("cmd", "/c", command)
+	} else {
+		_commandExec = exec.Command("sh", "-c", command)
+	}
 
 	if t.stdin != nil {
 		_commandExec.Stdin = t.stdin
